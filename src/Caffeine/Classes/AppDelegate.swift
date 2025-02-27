@@ -7,10 +7,9 @@
 
 import Cocoa
 import IOKit.pwr_mgt
-import Sparkle
 
 @main
-class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUStandardUserDriverDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     
     var isActive:Bool
     var userSessionIsActive:Bool
@@ -28,7 +27,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUStandardU
     @IBOutlet var infoSeparatorItem:NSMenuItem!
     
     var preferencesWindowController:PreferencesWindowController!
-    var updaterController:SPUStandardUpdaterController!
     
     override init() {
         self.isActive = false
@@ -60,9 +58,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUStandardU
         UserDefaults.standard.register(defaults: ["CASuppressLaunchMessage" : false])
         
         preferencesWindowController = PreferencesWindowController(windowNibName: "PreferencesWindowController")
-        updaterController = SPUStandardUpdaterController(startingUpdater: true,
-                                                         updaterDelegate: nil,
-                                                         userDriverDelegate: self);
         
         if !UserDefaults.standard.bool(forKey: "CASuppressLaunchMessage") {
             self.showPreferences(nil)
@@ -151,10 +146,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUStandardU
         preferencesWindowController.showWindow(self)
     }
     
-    @IBAction func checkForUpdates(_ sender:Any?) {
-        updaterController.checkForUpdates(sender)
-    }
-    
     
     // MARK:  Public
     // MARK:  ---
@@ -221,7 +212,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUStandardU
         if isActive {
             infoMenuItem.isHidden = false
             infoSeparatorItem.isHidden = false
-            
+
             if let timeoutTimer = self.timeoutTimer {
                 let left = Int(timeoutTimer.fireDate.timeIntervalSinceNow)
                 if left >= 3600 {
@@ -239,14 +230,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUStandardU
             infoSeparatorItem.isHidden = true
         }
     }
-
-    
-    // MARK: SPUStandardUserDriverDelegate
-    // MARK: ---
-    func supportsGentleScheduledUpdateReminders() -> Bool {
-        return true
-    }
-    
     
     // MARK: NSWorkspace Notifications
     // MARK: ---
